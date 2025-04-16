@@ -2,6 +2,7 @@ package util;
 
 import org.openqa.selenium.WebElement;
 import scraper.MangaScraper;
+import swingComponents.FileChooser;
 import swingComponents.InputBox;
 
 import java.io.IOException;
@@ -25,15 +26,18 @@ public class MangaScraperUtil implements Runnable{
 
         while (cont)
         {
+            scraper.openMainPage();
             InputBox inputBox = new InputBox();
             try {
                 mangaName = inputBox.getInput("What manga do you want to download?");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+
+            if(mangaName == null)
+                break;
 //            System.out.println("What manga do you want to download?");
 //            mangaName = Util.readString();
-
             try {
                 listOfManga = scraper.searchManga(mangaName);
             } catch (InterruptedException e) {
@@ -49,24 +53,32 @@ public class MangaScraperUtil implements Runnable{
             }
 
             mangaNameFinal = manga.getText();
+            FileChooser fileChooser = new FileChooser();
+            String path = fileChooser.getPath();
+
             manga.click();
+            if (path != null) {
+                try {
+                    scraper.scrapeAllChapters(mangaNameFinal, path);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
             try {
-                scraper.scrapeAllChapters(mangaNameFinal, PATH);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
+                continueOption = inputBox.getInput("Do you want to continue? (Y/N)");
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
-            System.out.println("Do you want to continue? (Y/N)");
-            continueOption = Util.readString();
-
-            if (continueOption.toLowerCase().equals("n"))
+            if (continueOption.toLowerCase().equals("n") || continueOption.toLowerCase().equals("no") || continueOption.toLowerCase().equals("no\n"))
             {
                 cont = false;
             }
-            scraper.openMainPage();
+
+            scraper.closeMainPage();
         }
     }
 

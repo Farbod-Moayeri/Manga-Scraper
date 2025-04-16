@@ -11,8 +11,5 @@ public class Main {
         MangaScraperUtil R1 = new MangaScraperUtil();
 
         R1.start();
-
-        //MangaScraperUtil R2 = new MangaScraperUtil();
-        //R2.start();
     }
 }

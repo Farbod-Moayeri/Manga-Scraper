@@ -2,6 +2,7 @@ package scraper;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -22,12 +23,15 @@ public class MangaScraper {
 
     public MangaScraper() {
         WebDriverManager.firefoxdriver().setup();
-        driver = new FirefoxDriver();
-        this.openMainPage();
     }
 
     public void openMainPage() {
+        driver = new FirefoxDriver();
         driver.get(url);
+    }
+
+    public void closeMainPage() {
+        driver.close();
     }
 
     public List<WebElement> searchManga(String title) throws InterruptedException {
@@ -49,9 +53,13 @@ public class MangaScraper {
         InputBox inputBox = new InputBox();
         String read = inputBox.getInput(allManga.toString());
 
-        for (WebElement element : elements) {
-            if (element.getText().equalsIgnoreCase(read)) {
-                return element;
+        if (read == null) {
+
+        } else {
+            for (WebElement element : elements) {
+                if (element.getText().equalsIgnoreCase(read)) {
+                    return element;
+                }
             }
         }
 
@@ -61,7 +69,15 @@ public class MangaScraper {
 
     public List<WebElement> getChapters() throws InterruptedException {
         Thread.sleep(rand.nextInt(1000) + 1000);
-        WebElement showAllChapters = driver.findElement(By.xpath("//*[contains(text(), 'Show All Chapters')]"));
+
+        WebElement showAllChapters = null;
+
+        try {
+            showAllChapters = driver.findElement(By.xpath("//*[contains(text(), 'Show All Chapters')]"));
+        } catch (NoSuchElementException e)
+        {
+
+        }
 
         if(showAllChapters != null) {
             showAllChapters.click();
