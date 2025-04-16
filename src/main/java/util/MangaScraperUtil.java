@@ -2,6 +2,7 @@ package util;
 
 import org.openqa.selenium.WebElement;
 import scraper.MangaScraper;
+import swingComponents.InputBox;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -24,8 +25,15 @@ public class MangaScraperUtil implements Runnable{
 
         while (cont)
         {
-            System.out.println("What manga do you want to download?");
-            mangaName = Util.readString();
+            InputBox inputBox = new InputBox();
+            try {
+                mangaName = inputBox.getInput("What manga do you want to download?");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+//            System.out.println("What manga do you want to download?");
+//            mangaName = Util.readString();
+
             try {
                 listOfManga = scraper.searchManga(mangaName);
             } catch (InterruptedException e) {
